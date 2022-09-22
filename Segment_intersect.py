@@ -1,3 +1,6 @@
+from r2point import R2Point
+
+
 # Находится ли точка на отрезке
 def on_segment(m, p, q):
     if min(m.x, p.x) <= q.x <= max(m.x, p.x) and min(m.y, p.y) <= q.y <= max(m.y, p.y):
@@ -29,3 +32,7 @@ def Segments_intersect(a, b, c, d):
         return True
     else:
         return False
+
+if __name__ == '__main__':
+    print(on_segment(R2Point(1,0), R2Point(0,1), R2Point(0.5, 0.5)))
+    print(Segments_intersect(R2Point(0,0), R2Point(1,1), R2Point(0, 1), R2Point(1, 0)))

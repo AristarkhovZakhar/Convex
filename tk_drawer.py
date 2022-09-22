@@ -23,7 +23,7 @@ class TkDrawer:
     def __init__(self):
         self.root = Tk()
         self.root.title("Выпуклая оболочка")
-        self.root.geometry(f"{SIZE+5}x{SIZE+5}")
+        self.root.geometry(f"{SIZE + 5}x{SIZE + 5}")
         self.root.resizable(False, False)
         self.root.bind('<Control-c>', quit)
         self.canvas = Canvas(self.root, width=SIZE, height=SIZE)
@@ -58,9 +58,9 @@ class TkDrawer:
 
 
 if __name__ == "__main__":
-
     import time
     from r2point import R2Point
+
     tk = TkDrawer()
     tk.clean()
     tk.draw_point(R2Point(2.0, 2.0))

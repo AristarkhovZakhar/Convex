@@ -44,6 +44,9 @@ class R2Point:
             return self.x == other.x and self.y == other.y
         return False
 
+    def __repr__(self):
+        return repr((self.x, self.y))
+
 if __name__ == "__main__":
     x = R2Point(1.0, 1.0)
     print(type(x), x.__dict__)

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S python3 -B
 from tk_drawer import TkDrawer
 from r2point import R2Point
-from convex import Void, Point, Segment, Polygon
+from convex import Void, Point, Segment, Polygon, Figure
 
 
 def void_draw(self, tk):
@@ -31,15 +31,16 @@ tk = TkDrawer()
 f = Void()
 tk.clean()
 print("Введите координаты отрезка")
-segment = Segment(R2Point(), R2Point())
+Figure.segment = Segment(R2Point(), R2Point())
 try:
 
     while True:
-        tk.draw_seg(segment.p, segment.q)
+        tk.draw_seg(Figure.segment.p, Figure.segment.q)
+        print('Введите координаты новой точки:')
         f = f.add(R2Point())
         tk.clean()
         f.draw(tk)
-        print(f"S = {f.area()}, P = {f.perimeter()}, Dist = {f.min_dist(segment)}\n")
+        print(f"S = {f.area()}, P = {f.perimeter()}, Dist = {f.min_dist(Figure.segment)}\n")
         if isinstance(f, Polygon):
             print(f.adj_matrix)
             print(Segment(f.points.first(), f.points.last()))

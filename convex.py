@@ -1,21 +1,16 @@
 from deq import Deq
 from r2point import R2Point
-import math
 from Segment_intersect import Segments_intersect, on_segment
 
 
 class Figure:
     """ Абстрактная фигура """
-    dist = math.inf
 
     def perimeter(self):
         return 0.0
 
     def area(self):
         return 0.0
-
-    def min_dist(self, seg):
-        return math.inf
 
 
 class Void(Figure):
@@ -31,11 +26,16 @@ class Point(Figure):
     def __init__(self, p):
         self.p = p
 
+    def repr(self):
+        return repr(self.p)
+
     def add(self, q):
         return self if self.p == q else Segment(self.p, q)
 
     # Вычисление минимального расстояния от точки до отрезка
     def min_dist(self, seg):
+        if self.p == seg.p or self.p == seg.q:
+            return 0
         if seg.p.x == seg.q.x:
             if min(seg.p.y, seg.q.y) <= self.p.y <= max(seg.p.y, seg.q.y):
                 return abs(self.p.x - seg.p.x)
@@ -48,12 +48,14 @@ class Point(Figure):
             else:
                 return min(R2Point.dist(self.p, seg.p), R2Point.dist(self.p, seg.q))
         else:
-            x = (self.p.x * (seg.p.x - seg.q.x) - (seg.p.y - self.p.y) * (seg.p.y - seg.q.y) + seg.p.x * (
-                    (seg.p.y - seg.q.y) ** 2 / (seg.p.x - seg.q.x))) \
-                / (seg.p.x - seg.q.x + (seg.p.y - seg.q.y) ** 2 / (seg.p.x - seg.q.x))
-            y = seg.p.y + (seg.p.y - seg.q.y) * (x - seg.p.x) / (seg.p.x - seg.q.x)
+            l = seg.q.x - seg.p.x
+            m = seg.q.y - seg.p.y
+            k = m / l
+            b = seg.p.y - seg.p.x * k
+            x = (self.p.y * k - b * k + self.p.x) / (k ** 2 + 1)
+            y = x * k + b
             if on_segment(seg.p, seg.q, R2Point(x, y)):
-                return math.sqrt(x ** 2 + y ** 2)
+                return R2Point.dist(R2Point(self.p.x, self.p.y), R2Point(x, y))
             else:
                 return min(R2Point.dist(self.p, seg.p), R2Point.dist(self.p, seg.q))
 
@@ -67,6 +69,9 @@ class Segment(Figure):
     # Задаем хэш для объекта класса Segment
     def __hash__(self):
         return hash((self.p.x, self.q.y))
+
+    def __repr__(self):
+        return repr((self.p, self.q))
 
     def perimeter(self):
         return 2.0 * self.p.dist(self.q)
@@ -97,12 +102,14 @@ class Segment(Figure):
 
 class Polygon(Figure):
     """ Многоугольник """
+
     # Словарь, в котором ключи-ребра многоугольника, а ключи - расстояния от них до заданного отрезка
-    adj_matrix = {}
 
     def __init__(self, a, b, c):
         self.points = Deq()
+        self.adj_matrix = {}
         self.points.push_first(b)
+
         if b.is_light(a, c):
             self.points.push_first(a)
             self.points.push_last(c)
@@ -111,6 +118,7 @@ class Polygon(Figure):
             self.points.push_first(c)
         self._perimeter = a.dist(b) + b.dist(c) + c.dist(a)
         self._area = abs(R2Point.area(a, b, c))
+        self._dist = self.start_dist(Figure.segment)
 
     def perimeter(self):
         return self._perimeter
@@ -119,8 +127,7 @@ class Polygon(Figure):
         return self._area
 
     # Вычисление минимального расстояния от многоугольника до отрезка
-    def min_dist(self, segment):
-        self.seg = segment
+    def start_dist(self, segment):
         a = Segment(self.points.first(), self.points.last()).min_dist(segment)
         self.adj_matrix[Segment(self.points.first(), self.points.last())] = a
         self.points.push_first(self.points.pop_last())
@@ -131,6 +138,10 @@ class Polygon(Figure):
         self.adj_matrix[Segment(self.points.first(), self.points.last())] = c
         self.points.push_first(self.points.pop_last())
         return min(a, b, c)
+
+    def min_dist(self, segment):
+        return self._dist
+
     # Операция нахождения в словаре adj_matrix ключа со значением seg
     def _search_in_matrix(self, seg):
         for i in self.adj_matrix.keys():
@@ -178,12 +189,18 @@ class Polygon(Figure):
             # добавление двух новых рёбер
             self._perimeter += t.dist(self.points.first()) + \
                                t.dist(self.points.last())
+            self.adj_matrix[Segment(t, self.points.first())] = Segment(t, self.points.first()).min_dist(Figure.segment)
+            self.adj_matrix[Segment(t, self.points.last())] = Segment(t, self.points.last()).min_dist(Figure.segment)
+            self._dist = min(self.adj_matrix.values())
             self.points.push_first(t)
-            Polygon.adj_matrix[Segment(t, self.points.first())] = Segment(t, self.points.first()).min_dist(self.seg)
-            Polygon.adj_matrix[Segment(t, self.points.last())] = Segment(t, self.points.last()).min_dist(self.seg)
 
         return self
 
 
 if __name__ == "__main__":
-    print(Point(R2Point(0, 0)).min_dist(Segment(R2Point(0, 1), R2Point(1, 0))))
+    print(Polygon(R2Point(
+        0.0, 0.0), R2Point(
+        1.0, 0.0), R2Point(
+        0.0, 1.0)).min_dist(Segment(R2Point(1.0, 1.0), R2Point(1.0, 2.0))))
+    print(Point(R2Point(1, 1)).min_dist(Segment(R2Point(0, 1), R2Point(1, 0))))
+    print(Point(R2Point(0, 2)).min_dist(Segment(R2Point(1.0, 1.0), R2Point(0.0, 0.0))))
