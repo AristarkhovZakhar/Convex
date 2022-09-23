@@ -15,9 +15,10 @@ class R2Point:
     # Площадь треугольника
     @staticmethod
     def area(a, b, c):
-        return 0.5 * ((a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x))
+        return 0.5 * ((a.x - c.x) * (b.y - c.y)
+                      - (a.y - c.y) * (b.x - c.x))
 
-    # Лежат ли точки на одной прямой?
+    # Лежат ли точки на одной прямой
     @staticmethod
     def is_triangle(a, b, c):
         return R2Point.area(a, b, c) != 0.0
@@ -46,6 +47,7 @@ class R2Point:
 
     def __repr__(self):
         return repr((self.x, self.y))
+
 
 if __name__ == "__main__":
     x = R2Point(1.0, 1.0)

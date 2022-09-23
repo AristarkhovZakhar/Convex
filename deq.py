@@ -3,8 +3,8 @@ class Deq:
     Реализация дека на базе вектора
     для языка Python она тривиальна)
     """
-    # Конструктор
 
+    # Конструктор
     def __init__(self):
         self.array = []
 
@@ -38,7 +38,6 @@ class Deq:
 
     def __iter__(self):
         return iter(self.array)
-
 
 
 if __name__ == "__main__":

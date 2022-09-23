@@ -40,10 +40,8 @@ try:
         f = f.add(R2Point())
         tk.clean()
         f.draw(tk)
-        print(f"S = {f.area()}, P = {f.perimeter()}, Dist = {f.min_dist(Figure.segment)}\n")
-        if isinstance(f, Polygon):
-            print(f.adj_matrix)
-            print(Segment(f.points.first(), f.points.last()))
+        print(f"S = {f.area()}, P = {f.perimeter()}, "
+              f"Dist = {f.min_dist(Figure.segment)}\n")
 except(EOFError, KeyboardInterrupt):
     print("\nStop")
     tk.close()
